@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/data/raw" />
       <excludeFolder url="file://$MODULE_DIR$/output" />
+      <excludeFolder url="file://$MODULE_DIR$/data/THUCNews" />
     </content>
     <orderEntry type="jdk" jdkName="dl" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
