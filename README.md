@@ -35,11 +35,14 @@
 
 ### 模型对比
 
-| 模型 | 验证集准确率 | 测试集准确率 | 参数量 | 训练时间 |
-|------|------------|------------|--------|---------|
-| TextCNN | 94.83%  | 95.39%  | 3.9M | ~30分钟 |
-| LSTM    | 95.39%  | 93.47%  | 7.0M | ~40分钟 |
-| BERT    | 待完成 | 待完成 | - | - |
+| 模型 | 验证集准确率 | 测试集准确率 | 参数量 |
+|------|------------|------------|--------|
+| TextCNN | 94.83%  | 95.39%     | 35.6M   | 
+| LSTM    | 95.39%  | 93.47%     | 37.9M   |
+| BERT    | 96.58% | 96.99%      |  102.3M|
+<img width="1485" height="884" alt="three_models_accuracy_comparison" src="https://github.com/user-attachments/assets/1e21c2ff-a674-4a4a-815f-a98e44061f15" />
+<img width="2927" height="884" alt="three_models_confusion_matrix" src="https://github.com/user-attachments/assets/02b68414-7550-46fb-9ac6-51c7596bdeae" />
+
 
 **关键发现**：
 - TextCNN在测试集上表现最好（95.39%）
@@ -47,6 +50,11 @@
 - LSTM参数量更大，但在这个任务上优势不明显
 
 ### 训练曲线
+<img width="2100" height="750" alt="textcnn_training_curve" src="https://github.com/user-attachments/assets/d83bf162-20c4-4997-b6be-1623856f8ac6" />
+
+<img width="2100" height="750" alt="lstm_training_curve" src="https://github.com/user-attachments/assets/98d4d4fa-47c8-4e40-8a4e-bcfd884ce060" />
+
+<img width="2085" height="734" alt="bert_training_curve" src="https://github.com/user-attachments/assets/94d3a774-45f3-401f-93bc-259f0f01f21a" />
 
 
 
@@ -169,6 +177,32 @@ text-classification-zh/
 - 优点：平衡了长期记忆保存和短期输入
 - 缺点：相对于GRU,结构更复杂，训练成本高
 
+### BERT
+- **核心思想**：
+  - **预训练+微调**：先在大量文本上预训练（学习语言表示），再在下游任务上微调
+  - **Masked Language Model (MLM)**：随机遮盖15%的词，让模型预测被遮盖的词，学习上下文理解
+  - **双向编码**：使用Transformer Encoder，能同时看到前后文（不像LSTM只能从左到右）
+  - 本项目中：使用预训练的bert-base-chinese，在THUCNews数据集上微调用于新闻分类
+  
+- **主要参数**：
+  - 模型：bert-base-chinese（中文预训练模型）
+  - 隐藏层：768维
+  - Transformer层数：12层
+  - 注意力头：12个
+  - 最大长度：128（本项目，标准512）
+  - 学习率：2e-5（微调专用，比从零训练小50倍）
+  
+- **优点**：
+  - 预训练模型效果好，本项目达到96.99%准确率（最高）
+  - 不需要构建词表，直接用预训练的tokenizer
+  - 泛化能力强，理解上下文语义
+  - 迁移学习，适用各种NLP任务
+  
+- **缺点**：
+  - 参数量大（102M，是TextCNN的26倍）
+  - 训练时间长（即使是微调也需要45分钟）
+  - 推理速度慢（实时系统可能不适用）
+  - 显存占用大（batch_size只能16-32，TextCNN可以64+）
 ---
 
 ## 📝 实验记录
